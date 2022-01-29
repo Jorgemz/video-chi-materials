@@ -280,6 +280,7 @@ extension GameScene: SKPhysicsContactDelegate {
         [.scale(to: 0, duration: 0.08), .removeFromParent()]
       )
       prize.run(sequence)
+      try? hapticManager?.playNomNom()
       runNomNomAnimation(delay: 0.15)
       
       // transition to next level

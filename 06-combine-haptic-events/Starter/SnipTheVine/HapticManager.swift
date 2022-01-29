@@ -52,16 +52,23 @@ extension HapticManager {
   // MARK: Play Haptic Patterns
 
   func playSlice() throws {
-    try hapticEngine.start()
-    let player = try hapticEngine.makePlayer(with: slicePattern())
-    try player.start(atTime: CHHapticTimeImmediate)
+    try playHaptic(pattern: slicePattern())
+  }
+  
+  func playNomNom() throws {
+    try playHaptic(pattern: nomNomPattern())
   }
 }
 
 // MARK: - private
 private extension HapticManager {
   // MARK: Haptic Patterns
-
+  func playHaptic(pattern: CHHapticPattern) throws {
+    try hapticEngine.start()
+    let player = try hapticEngine.makePlayer(with: pattern)
+    try player.start(atTime: CHHapticTimeImmediate)
+  }
+  
   func slicePattern() throws -> CHHapticPattern {
     let slice = CHHapticEvent(
       eventType: .hapticContinuous,
@@ -86,5 +93,36 @@ private extension HapticManager {
       events: [slice, snip],
       parameters: []
     )
+  }
+  
+  func nomNomPattern() throws -> CHHapticPattern {
+    let rumbles = [
+      (intensity: 1, sharpness: 0.3, relativeTime: 0, duration: 0.15),
+      (intensity: 0.4, sharpness: 0.1, relativeTime: 0.3, duration: 0.3)
+    ].map {
+      CHHapticEvent(
+        eventType: .hapticContinuous,
+        parameters: [
+          .init(parameterID: .hapticIntensity, value: $0.intensity),
+          .init(parameterID: .hapticSharpness, value: $0.sharpness)
+        ],
+        relativeTime: $0.relativeTime,
+        duration: $0.duration)
+    }
+    let crunches = [
+      (sharpness: 1, relativeTime: 0),
+      (sharpness: 0.3, relativeTime: 0.5)
+    ].map {
+      CHHapticEvent(
+        eventType: .hapticTransient,
+        parameters: [
+          .init(parameterID: .hapticIntensity, value: 1),
+          .init(parameterID: .hapticSharpness, value: $0.sharpness)
+        ],
+        relativeTime: $0.relativeTime
+        )
+    }
+    
+    return try CHHapticPattern(events: rumbles + crunches, parameters: [])
   }
 }
