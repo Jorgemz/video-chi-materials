@@ -39,6 +39,9 @@ final class HapticManager {
 
     let hapticEngine = try CHHapticEngine()
     self.hapticEngine = hapticEngine
+    
+    try hapticEngine.start()
+    hapticEngine.isAutoShutdownEnabled = true
   }
 
   private let hapticEngine: CHHapticEngine
@@ -52,7 +55,6 @@ extension HapticManager {
     try hapticEngine.start()
     let player = try hapticEngine.makePlayer(with: slicePattern())
     try player.start(atTime: CHHapticTimeImmediate)
-    hapticEngine.notifyWhenPlayersFinished { _ in .stopEngine }
   }
 }
 
