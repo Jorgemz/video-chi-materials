@@ -73,6 +73,13 @@ final class GameScene: SKScene {
     if !backgroundMusicPlayer.isPlaying {
       backgroundMusicPlayer.play()
     }
+    
+    do {
+      let hapticManager = try HapticManager()
+      self.hapticManager = hapticManager
+    } catch {
+      hapticManager = nil
+    }
 
     super.init(size: size)
     scaleMode = .aspectFill
@@ -121,6 +128,7 @@ final class GameScene: SKScene {
 
   private let crocodile: SKSpriteNode
   private let prize: SKSpriteNode
+  private let hapticManager: HapticManager?
 
   private var levelIsOver = false
   private var didCutVine = false
@@ -196,6 +204,7 @@ private extension GameScene {
     crocodile.removeAllActions()
     crocodile.texture = .init(imageNamed: .crocMouthOpen)
     animateCrocodile()
+    try? hapticManager?.playSlice()
     didCutVine = true
   }
 

@@ -30,16 +30,51 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-final class HapticManager {
+import CoreHaptics
 
+final class HapticManager {
+  init() throws {
+    guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { throw CHHapticError(.notSupported) }
+    
+    self.hapticEngine = try CHHapticEngine()
+  }
+  
+  let hapticEngine: CHHapticEngine
 }
 
 // MARK: - internal
 extension HapticManager {
   // MARK: Play Haptic Patterns
+  
+  func playSlice() throws {
+    try hapticEngine.start()
+    let player = try hapticEngine.makePlayer(with: slicePattern())
+    try player.stop(atTime: CHHapticTimeImmediate)
+    hapticEngine.notifyWhenPlayersFinished { _ in .stopEngine }
+  }
 }
 
 // MARK: - private
 private extension HapticManager {
   // MARK: Haptic Patterns
+  func slicePattern() throws -> CHHapticPattern {
+    let slice = CHHapticEvent(
+      eventType: .hapticContinuous,
+      parameters: [
+        .init(parameterID: .hapticIntensity, value: 0.35),
+        .init(parameterID: .hapticSharpness, value: 0.25),
+      ],
+      relativeTime: 0,
+      duration: 0.5)
+    
+    let snip = CHHapticEvent(
+      eventType: .hapticTransient,
+      parameters: [
+        .init(parameterID: .hapticIntensity, value: 1),
+        .init(parameterID: .hapticSharpness, value: 1)
+      ],
+      relativeTime: 0.08)
+    
+    return try .init(events: [slice, snip], parameters: [])
+  }
 }
