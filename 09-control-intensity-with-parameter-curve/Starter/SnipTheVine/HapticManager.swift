@@ -57,13 +57,35 @@ final class HapticManager {
 
     try hapticEngine.start()
     hapticEngine.isAutoShutdownEnabled = true
+    
+    let swish = CHHapticEvent(
+      eventType: .hapticContinuous,
+      parameters: [
+        .init(parameterID: .hapticIntensity, value: 0.5),
+        .init(parameterID: .hapticSharpness, value: 1)
+      ],
+      relativeTime: 0,
+      duration: 60)
+    
+    let pattern = try CHHapticPattern(events: [swish], parameters: [])
+    swishPlayer = try hapticEngine.makeAdvancedPlayer(with: pattern)
   }
 
   private let hapticEngine: CHHapticEngine
+  private let swishPlayer: CHHapticAdvancedPatternPlayer
 }
 
 // MARK: - internal
 extension HapticManager {
+  func startSwishPlayer() throws {
+    try hapticEngine.start()
+    try swishPlayer.stop(atTime: CHHapticTimeImmediate)
+  }
+  
+  func stopSwishPlayer() throws {
+    try swishPlayer.stop(atTime: CHHapticTimeImmediate)
+  }
+  
   // MARK: Play Haptic Patterns
 
   func playSlice() throws {
@@ -93,8 +115,8 @@ private extension HapticManager {
     let slice = CHHapticEvent(
       eventType: .hapticContinuous,
       parameters: [
-        .init(parameterID: .hapticIntensity, value: 0.35),
-        .init(parameterID: .hapticSharpness, value: 0.25),
+        .init(parameterID: .hapticIntensity, value: 0.6),
+        .init(parameterID: .hapticSharpness, value: 0.8),
       ],
       relativeTime: 0,
       duration: 0.5
@@ -108,13 +130,24 @@ private extension HapticManager {
       ],
       relativeTime: 0.08
     )
+    
+    let curve = CHHapticParameterCurve(
+      parameterID: .hapticIntensityControl,
+      controlPoints: [
+        .init(relativeTime: 0, value: 0.2),
+        .init(relativeTime: 0.08, value: 1),
+        .init(relativeTime: 0.24, value: 0.2),
+        .init(relativeTime: 0.34, value: 0.6),
+        .init(relativeTime: 0.5, value: 0)
+      ],
+      relativeTime: 0)
 
     return try .init(
       events: [
         slice, snip,
         .init(audioResourceID: sliceID, parameters: [], relativeTime: 0)
       ],
-      parameters: []
+      parameterCurves: [curve]
     )
   }
 

@@ -247,6 +247,7 @@ private extension GameScene {
 extension GameScene {
   override func touchesBegan(_: Set<UITouch>, with _: UIEvent?) {
     didCutVine = false
+    try? hapticManager?.startSwishPlayer()
   }
 
   override func touchesMoved(_ touches: Set<UITouch>, with _: UIEvent?) {
@@ -272,6 +273,7 @@ extension GameScene {
   override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
     particles?.removeFromParent()
     particles = nil
+    try? hapticManager?.stopSwishPlayer()
   }
 }
 
