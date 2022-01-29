@@ -77,8 +77,20 @@ final class GameScene: SKScene {
     do {
       let hapticManager = try HapticManager()
       self.hapticManager = hapticManager
+      
+      sliceSoundAction = .run {
+        try? hapticManager.playSlice()
+      }
+      
+      nomNomSoundAction = .run {
+        try? hapticManager.playNomNom()
+      }
+      
     } catch {
       hapticManager = nil
+      
+      sliceSoundAction = .playSoundFileNamed(SoundFile.slice, waitForCompletion: false)
+      nomNomSoundAction = .playSoundFileNamed(SoundFile.nomNom, waitForCompletion: false)
     }
 
     super.init(size: size)
@@ -128,6 +140,8 @@ final class GameScene: SKScene {
 
   private let crocodile: SKSpriteNode
   private let prize: SKSpriteNode
+  private let sliceSoundAction: SKAction
+  private let nomNomSoundAction: SKAction
   private let hapticManager: HapticManager?
 
   private var levelIsOver = false
@@ -204,6 +218,7 @@ private extension GameScene {
     crocodile.removeAllActions()
     crocodile.texture = .init(imageNamed: .crocMouthOpen)
     animateCrocodile()
+    run(sliceSoundAction)
     try? hapticManager?.playSlice()
     didCutVine = true
   }
@@ -280,7 +295,7 @@ extension GameScene: SKPhysicsContactDelegate {
         [.scale(to: 0, duration: 0.08), .removeFromParent()]
       )
       prize.run(sequence)
-      try? hapticManager?.playNomNom()
+      run(nomNomSoundAction)
       runNomNomAnimation(delay: 0.15)
       
       // transition to next level

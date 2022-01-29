@@ -33,12 +33,27 @@
 import CoreHaptics
 
 final class HapticManager {
+  let sliceID: CHHapticAudioResourceID
+  let nomNomID: CHHapticAudioResourceID
+  let splashID: CHHapticAudioResourceID
+  
   init() throws {
     guard CHHapticEngine.capabilitiesForHardware().supportsHaptics
     else { throw CHHapticError(.notSupported) }
 
     let hapticEngine = try CHHapticEngine()
     self.hapticEngine = hapticEngine
+    
+    func id(name: String) throws -> CHHapticAudioResourceID {
+      guard let url = Bundle.main.url(forResource: name, withExtension: "caf")
+      else { throw CHHapticError(.resourceNotAvailable) }
+      
+      return try hapticEngine.registerAudioResource(url)
+    }
+    
+    sliceID = try id(name: "Slice")
+    nomNomID = try id(name: "NomNom")
+    splashID = try id(name: "Splash")
 
     try hapticEngine.start()
     hapticEngine.isAutoShutdownEnabled = true
@@ -91,7 +106,10 @@ private extension HapticManager {
     )
 
     return try .init(
-      events: [slice, snip],
+      events: [
+        slice, snip,
+        .init(audioResourceID: sliceID, parameters: [], relativeTime: 0)
+      ],
       parameters: []
     )
   }
@@ -126,6 +144,9 @@ private extension HapticManager {
       )
     }
 
-    return try CHHapticPattern(events: rumbles + crunches, parameters: [])
+    return try CHHapticPattern(
+      events: rumbles + crunches
+      + [.init(audioResourceID: nomNomID, parameters: [], relativeTime: 0)],
+      parameters: [])
   }
 }
