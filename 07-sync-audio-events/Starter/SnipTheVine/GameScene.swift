@@ -86,11 +86,17 @@ final class GameScene: SKScene {
         try? hapticManager.playNomNom()
       }
       
+      splashSoundAction = .run {
+        try? hapticManager.playSplash()
+      }
+      
     } catch {
       hapticManager = nil
       
       sliceSoundAction = .playSoundFileNamed(SoundFile.slice, waitForCompletion: false)
       nomNomSoundAction = .playSoundFileNamed(SoundFile.nomNom, waitForCompletion: false)
+      
+      splashSoundAction = .playSoundFileNamed(SoundFile.splash, waitForCompletion: false)
     }
 
     super.init(size: size)
@@ -142,6 +148,7 @@ final class GameScene: SKScene {
   private let prize: SKSpriteNode
   private let sliceSoundAction: SKAction
   private let nomNomSoundAction: SKAction
+  private let splashSoundAction: SKAction
   private let hapticManager: HapticManager?
 
   private var levelIsOver = false

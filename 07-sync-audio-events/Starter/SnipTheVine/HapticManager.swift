@@ -73,6 +73,10 @@ extension HapticManager {
   func playNomNom() throws {
     try playHaptic(pattern: nomNomPattern())
   }
+  
+  func playSplash() throws {
+    try playHaptic(pattern: splashPattern())
+  }
 }
 
 // MARK: - private
@@ -147,6 +151,37 @@ private extension HapticManager {
     return try CHHapticPattern(
       events: rumbles + crunches
       + [.init(audioResourceID: nomNomID, parameters: [], relativeTime: 0)],
+      parameters: [])
+  }
+  
+  func splashPattern() throws -> CHHapticPattern {
+    let splish = CHHapticEvent(
+      eventType: .hapticTransient,
+      parameters: [
+        .init(parameterID: .hapticIntensity, value: 1),
+        .init(parameterID: .hapticSharpness, value: 0.1)
+    ],
+      relativeTime: 0
+    )
+    
+    let splash = CHHapticEvent(
+      eventType: .hapticContinuous,
+      parameters: [
+        .init(parameterID: .hapticIntensity, value: 0.5),
+        .init(parameterID: .hapticSharpness, value: 0.1),
+        .init(parameterID: .attackTime, value: 0.1),
+        .init(parameterID: .decayTime, value: 0.3),
+        .init(parameterID: .releaseTime, value: 0.2),
+    ],
+      relativeTime: 0.1,
+      duration: 0.6
+    )
+    
+    return try CHHapticPattern(
+      events: [
+        splish, splash,
+        .init(audioResourceID: splashID, parameters: [], relativeTime: 0)
+    ],
       parameters: [])
   }
 }
