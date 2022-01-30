@@ -267,6 +267,10 @@ extension GameScene {
       showMoveParticles(touchPosition: startPoint)
 
       // update haptic player intensity
+      let distance = CGVector(dx: abs(startPoint.x - endPoint.x), dy: abs(startPoint.y - endPoint.y))
+      let distanceRatio = CGVector(dx: distance.dx / size.width, dy: distance.dy / size.height)
+      let intensity = Float(max(distanceRatio.dx, distanceRatio.dy)) * 100
+      try? hapticManager?.updateSwishPlayer(intensity: intensity)
     }
   }
 

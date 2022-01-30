@@ -82,6 +82,16 @@ extension HapticManager {
     try hapticEngine.start()
     try swishPlayer.start(atTime: CHHapticTimeImmediate)
   }
+  
+  func updateSwishPlayer(intensity: Float) throws {
+    let intensity = CHHapticDynamicParameter(
+      parameterID: .hapticIntensityControl,
+      value: intensity,
+      relativeTime: 0
+    )
+    
+    try swishPlayer.sendParameters([intensity], atTime: CHHapticTimeImmediate)
+  }
 
   func stopSwishPlayer() throws {
     try swishPlayer.stop(atTime: CHHapticTimeImmediate)
